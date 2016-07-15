@@ -72,7 +72,7 @@ fn server_loop(bot_state: state::Bot, command_state: state::State) {
                                 },
 							}
 						} else {
-							"You must be in a voice channel to DJ".to_owned()
+							"You must be in a voice channel to shitpost".to_owned()
 						};
 						if output.is_empty() {
 							warn(discord.send_message(&message.channel_id, &output, "", false));
