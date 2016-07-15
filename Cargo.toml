@@ -1,0 +1,9 @@
+[package]
+name = "discord-gta-soundboard"
+version = "0.1.0"
+authors = ["Connor Hilarides <connorcpu@live.com>"]
+
+[dependencies]
+discord = "0.6"
+rpassword = "0.2.2"
+rustc-serialize = "0.3"
