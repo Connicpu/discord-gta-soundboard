@@ -57,15 +57,29 @@ fn server_loop(bot_state: state::Bot, command_state: state::State) {
 					} else {
 						let output = if let Some((server_id, channel_id)) = vchan {
 							match command_state.read().unwrap().musical_treats.get(argument) {
-                                Some(song) => match discord::voice::open_ffmpeg_stream(song) {
-                                    Ok(stream) => {
-                                        let voice = connection.voice(server_id);
-                                        voice.set_deaf(true);
-                                        voice.connect(channel_id);
-                                        voice.play(stream);
-                                        String::new()
-                                    },
-                                    Err(error) => format!("Error: {}", error),
+                                Some(song) => if song.starts_with("http") {
+									match discord::voice::open_ytdl_stream(song) {
+										Ok(stream) => {
+											let voice = connection.voice(server_id);
+											//voice.set_deaf(true);
+											voice.connect(channel_id);
+											voice.play(stream);
+											String::new()
+										},
+										Err(error) => format!("Error: {}, url: {}", error, song),
+									}
+								}
+								else {
+									match discord::voice::open_ffmpeg_stream(song) {
+										Ok(stream) => {
+											let voice = connection.voice(server_id);
+											voice.set_deaf(true);
+											voice.connect(channel_id);
+											voice.play(stream);
+											String::new()
+										},
+										Err(error) => format!("Error: {}, file: {}", error, song),
+									}
                                 },
                                 None => {
                                     format!("No song named {} was found", argument)
@@ -74,7 +88,7 @@ fn server_loop(bot_state: state::Bot, command_state: state::State) {
 						} else {
 							"You must be in a voice channel to shitpost".to_owned()
 						};
-						if output.is_empty() {
+						if !output.is_empty() {
 							warn(discord.send_message(&message.channel_id, &output, "", false));
 						}
 					}

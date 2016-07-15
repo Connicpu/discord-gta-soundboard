@@ -20,7 +20,10 @@ pub struct Bot {
 
 impl StateData {
     pub fn load() -> State {
-        StateData::try_load().unwrap_or_else(|_| {
+        StateData::try_load().map(|ok| {
+            println!("Loaded {} musical treats", ok.read().unwrap().musical_treats.len());
+            ok
+        }).unwrap_or_else(|_| {
             println!("discord-settings.json did not exist.");
             println!("You should consider adding musical treats ;)");
             Arc::new(RwLock::new(StateData {
@@ -49,7 +52,11 @@ impl StateData {
 
     fn get_file(write: bool) -> io::Result<fs::File> {
         let mut opts = fs::OpenOptions::new();
-        if write { opts.create(true).truncate(true).write(true); }
+        if write {
+            opts.create(true).truncate(true).write(true);
+        } else {
+            opts.read(true);
+        }
         opts.open("discord-settings.json")
     }
 }

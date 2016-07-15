@@ -4,6 +4,7 @@ extern crate rustc_serialize;
 
 use std::sync::Arc;
 use std::io::BufRead;
+use std::env;
 
 mod login;
 mod state;
@@ -40,7 +41,19 @@ fn main() {
                 let mut lock = state.write().unwrap();
                 lock.musical_treats.insert(key, path);
                 lock.save().unwrap();
-            },
+            }
+            "get-link" => {
+                use discord::model::permissions::*;
+                print!("https://discordapp.com/oauth2/authorize");
+                print!("?client_id={}", env::var("GTA_BOT_ID").unwrap());
+                println!("&scope=bot&permissions={}",
+                    (SEND_TTS_MESSAGES |
+                    EMBED_LINKS |
+                    MENTION_EVERYONE |
+                    VOICE_CONNECT |
+                    VOICE_SPEAK).bits()
+                );
+            }
             _ => println!("Unknown command"),
         }
     }
